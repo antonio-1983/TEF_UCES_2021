@@ -17,8 +17,8 @@ El juego es un entrenamiento para francotirador contra extraterrestres que tiene
 El juego consiste en disparar 10 balas a 4 naves extraterrestre, las 2 últimas naves tienen una mayor velocidad. El juego termina cuando se acaban las 10 balas o cuando se eliminan a todas las naves.
  Los controles son:
 
-    para mover la mira.
+   flechas del tecladopara mover la mira
 
-
+   
 
 BARRA ESPACIADORA PARA DISPARAR
