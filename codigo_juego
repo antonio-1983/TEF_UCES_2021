@@ -1,0 +1,326 @@
+#include <time.h>
+#include <iostream>
+#include <allegro.h>
+#include <sstream>
+#define ANCHO 1000
+#define LARGO 600
+
+using namespace std;
+class pantalla
+{
+public:
+    unsigned int puntos;
+    char puntaje[20];
+    unsigned int balas;
+public:
+    pantalla()
+    {
+        this->puntos=0;
+        this->balas=10;
+    }
+    void generar_portada (BITMAP * buffer, BITMAP *buffer_robotech)
+    {
+        draw_sprite(buffer,buffer_robotech,ANCHO/2-175,LARGO/2-255);
+    }
+    void generar_instrucciones(BITMAP *buffer)
+    {
+        textout_ex(screen,font,"COMIENZA EL ENTRENAMIENTO",400,100,0xFFFFFF,0x000000);
+        textout_ex(screen,font,"TIENES 10 BALAS EN EL ARMA",400,200,0xFFFFFF,0x000000);
+    }
+    void sumar_puntos(BITMAP *buffer)
+    {
+        this->puntos+=100;
+    }
+    void generar_balas(BITMAP*buffer, BITMAP *buffer_balas)
+    {
+        textout_ex(buffer,font,"BALAS ",ANCHO-300,15,0xFFFFFF,0x000000);
+        for(unsigned int i=0; i<balas; i++)
+        {
+            draw_sprite(buffer,buffer_balas,i*20+(ANCHO-250),15);
+        }
+    }
+    void generar_puntos(BITMAP * buffer)
+    {
+        std::stringstream ss;
+        ss<<"PUNTOS: "<<puntos;
+        std::string p =ss.str();
+        strcpy(puntaje,p.c_str());
+        textout_ex(buffer,font,puntaje,50,15,0xFFFFFF,0x000000);
+    }
+    void generar_mensaje_fin(BITMAP *buffer)
+    {
+        std::stringstream ss;
+        ss<<"SU PUNTAJE ES: "<<puntos;
+        std::string p =ss.str();
+        strcpy(puntaje,p.c_str());
+        textout_ex(buffer,font,puntaje,400,150,0xFFFFFF,0x000000);
+    }
+    void generar_game_over (BITMAP *buffer,BITMAP *buffer_game_over)
+    {
+        draw_sprite(buffer,buffer_game_over,ANCHO/2-180,LARGO/2-93);
+    }
+};
+class francotirador
+{
+public:
+    int cx, cy;
+public:
+    francotirador()
+    {
+        this->cx=150;
+        this->cy=100;
+    }
+    void construir_mira(BITMAP *buffer, BITMAP *buffer_mira)
+    {
+        draw_sprite(buffer,buffer_mira,cx,cy);
+    }
+    void mover_mira(BITMAP *buffer)
+    {
+        if(key[KEY_RIGHT] && cx<ANCHO-61)
+        {
+            cx+=10;
+
+        }
+        if(key[KEY_LEFT] && cx>5)
+        {
+            cx-=10;
+
+        }
+        if(key[KEY_UP] && cy>-10)
+        {
+            cy-=10;
+
+        }
+        if(key[KEY_DOWN] && cy<LARGO-61)
+        {
+            cy+=10;
+
+        }
+        rest(10);
+    }
+    void explosion(BITMAP *buffer)
+    {
+        int ex=cx+40,ey=cy+40;
+        line(buffer,ex,ey+5,ex+15,ey-5, 0xe9df16);//1 a 2
+        line(buffer,ex+15,ey-5,ex+5,ey-5, 0xe9df16);//2 a 3
+        line(buffer,ex+5,ey-5,ex+5,ey-15, 0xe9df16);//3 a 4
+        line(buffer,ex+5,ey-15,ex,ey-5, 0xe9df16);//4 a 5
+        line(buffer,ex,ey-5,cx-5,ey-15, 0xe9df16);//5 a 6
+        line(buffer,ex-5,ey-15,ex-5,ey-5, 0xe9df16);// 6 a 7
+        line(buffer,ex-5,ey-5,ex-15,ey-20, 0xe9df16);//7 a 8
+        line(buffer,ex-15,ey-20,ex-10,ey-5, 0xe9df16);//8 a 9
+        line(buffer,ex-10,ey-5,ex-20,ey-10, 0xe9df16);//9 a 10
+        line(buffer,ex-20,ey-10,ex-10,ey,0xe9df16); //10 a 11
+        line(buffer,ex-10,ey,cx-25,ey-5, 0xe9df16);// 11 a 12
+        line(buffer,ex-25,ey-5,ex-10,ey+5, 0xe9df16);// 12 a 13
+        line(buffer,ex-10,ey+5,ex-15,ey+15, 0xe9df16);//13 a 14
+        line(buffer,ex-15,ey+15,ex-5,ey+5, 0xe9df16);//14 a 15
+        line(buffer,ex-5,ey+5,ex-5,ey+15, 0xe9df16);// 15 a 16
+        line(buffer,ex-5,ey+15,ex,ey+5, 0xe9df16);//16 a 17
+        line(buffer,ex,ey+5,ex+15,ey+15, 0xe9df16);//17 a 18
+        line(buffer,ex+15,ey+15,ex+5,ey, 0xe9df16);//18 a 1
+        blit(buffer,screen,0,0,0,0,ANCHO,LARGO);
+        rest(200);
+    }
+};
+class zentraedi
+{
+public:
+    unsigned int vida;
+    int nx;
+    int ny;
+    int velocidad;
+public:
+    zentraedi()
+    {
+        this ->vida=2;
+        this-> nx=0;
+        this-> ny=0;
+        this-> velocidad=1;
+    }
+    void construir_nave (BITMAP *buffer, BITMAP *buffer_nave)
+    {
+        draw_sprite(buffer,buffer_nave,nx,ny);
+    }
+    void mover_nave()
+    {
+        int num;
+        num=1+rand()%10;
+        int tx=0, ty=0;
+        if(num==1 && nx<ANCHO-210)
+        {
+            tx=50 ;
+            nx+=tx;
+            ny+=ty;
+        }
+        if(num==2 && nx>50)
+        {
+            tx= (-50) ;
+            nx+=tx;
+            ny+=ty;
+        }
+        if(num==3 && ny>150)
+        {
+            ty= (-50);
+            nx+=tx;
+            ny+=ty;
+        }
+        if(num==4 && ny<LARGO-150)
+        {
+            ty=50;
+            nx+=tx;
+            ny+=ty;
+        }
+        if(velocidad==2)
+        {
+            if(num==5 && nx>300)
+            {
+                tx= (-250) ;
+                nx+=tx;
+                ny+=ty;
+            }
+            if(num==6 && nx<ANCHO-460)
+            {
+                tx=250 ;
+                nx+=tx;
+                ny+=ty;
+            }
+        }
+        rest(10);
+    }
+    void explosion_nave(BITMAP *buffer,BITMAP *buffer_explosion)
+    {
+        draw_sprite(buffer,buffer_explosion,nx+40,ny+10);
+        rest(100);
+        blit(buffer, screen, 0, 0, 0, 0, ANCHO, LARGO);
+        clear(buffer);
+        rest(50);
+    }
+    void generar_coordenadas()
+    {
+        nx=160+rand()%ANCHO-160;
+        ny=70+rand()%LARGO-70;
+    }
+};
+class zentraedi2 : public zentraedi
+{
+public:
+    zentraedi2()
+    {
+    this->velocidad=2;
+    }
+
+public:
+
+    void construir_nave2 (BITMAP *buffer, BITMAP *buffer_nave2)
+    {
+        draw_sprite(buffer,buffer_nave2,nx,ny);
+    }
+};
+int main()
+{
+    allegro_init();
+    install_keyboard();
+    set_color_depth(32);
+    set_gfx_mode(GFX_AUTODETECT_WINDOWED, ANCHO, LARGO, 0, 0);
+    if (install_sound(DIGI_AUTODETECT, MIDI_AUTODETECT, NULL) != 0)
+    {
+        allegro_message("Error: inicializando sistema de sonido\n%s\n", allegro_error);
+        return 1;
+    }
+    set_volume(70, 70);
+
+    BITMAP *buffer = create_bitmap(ANCHO,LARGO);
+    BITMAP *buffer_explosion=create_bitmap(61,61);
+    BITMAP *buffer_nave=create_bitmap(160,65);
+    BITMAP *buffer_mira=create_bitmap(61,61);
+    BITMAP *buffer_game_over=create_bitmap(360,186);
+    BITMAP *buffer_robotech=create_bitmap(350,510);
+    BITMAP *buffer_balas=create_bitmap(7,20);
+    BITMAP *buffer_nave2=create_bitmap(160,65);
+
+    buffer_nave2=load_bitmap("nave2.bmp",NULL);
+    buffer_nave=load_bitmap("nave.bmp",NULL);
+    buffer_mira=load_bitmap("mira.bmp",NULL);
+    buffer_explosion=load_bitmap("explosion.bmp",NULL);
+    buffer_game_over=load_bitmap("game_over.bmp",NULL);
+    buffer_robotech=load_bitmap("robotech.bmp",NULL);
+    buffer_balas=load_bitmap("balas.bmp",NULL);
+
+
+    srand(time(NULL));
+
+    pantalla entorno;
+    francotirador player1;
+    zentraedi nave;
+    zentraedi2 nave2;
+
+    blit(buffer, screen, 0, 0, 0, 0, ANCHO, LARGO);
+    entorno.generar_portada(buffer,buffer_robotech);
+    blit(buffer, screen, 0, 0, 0, 0, ANCHO, LARGO);
+    rest(2000);
+    clear(buffer);
+    blit(buffer, screen, 0, 0, 0, 0, ANCHO, LARGO);
+    entorno.generar_instrucciones(buffer);
+    rest(4000);
+    nave.generar_coordenadas();
+    nave2.generar_coordenadas();
+    while(entorno.balas>0 && nave2.vida>0)
+    {
+        clear_to_color(buffer, 0x000000);
+        if(nave.vida>0)
+        {
+            nave.construir_nave(buffer,buffer_nave);
+            nave.mover_nave();
+        }
+        if(nave.vida==0 && nave2.vida>0)
+        {
+            nave2.construir_nave2(buffer,buffer_nave2);
+            nave2.mover_nave();
+        }
+        player1.construir_mira(buffer,buffer_mira);
+        entorno.generar_puntos(buffer);
+        entorno.generar_balas(buffer,buffer_balas);
+        blit(buffer, screen, 0, 0, 0, 0, ANCHO, LARGO);
+        player1.mover_mira(buffer);
+
+        if (key[KEY_SPACE] && entorno.balas>0)
+        {
+            player1.explosion(buffer);
+            if((player1.cx+30>=nave.nx+10 && player1.cx<=nave.nx+130 && player1.cy+30>=nave.ny+10 && player1.cy+30<=nave.ny+60)
+                    || (player1.cx+30>=nave2.nx+10 && player1.cx<=nave2.nx+130 && player1.cy+30>=nave2.ny+10 && player1.cy+30<=nave2.ny+60))
+            {
+                blit(buffer, screen, 0, 0, 0, 0, ANCHO, LARGO);
+                rest(200);
+                rest(50);
+                if(nave.vida>0)
+                {
+                    nave.vida-=1;
+                    nave.explosion_nave(buffer,buffer_explosion);
+                }
+                else
+                {
+                    nave2.vida-=1;
+                    nave2.explosion_nave(buffer,buffer_explosion);
+                }
+                rest(100);
+                blit(buffer, screen, 0, 0, 0, 0, ANCHO, LARGO);
+                entorno.sumar_puntos(buffer);
+                rest(100);
+            }
+            entorno.balas-=1;
+        }
+    }
+    clear(buffer);
+    blit(buffer,screen,0,0,0,0,ANCHO,LARGO);
+    rest(1000);
+    entorno.generar_mensaje_fin(buffer);
+    rest(1000);
+    entorno.generar_game_over(buffer,buffer_game_over);
+    blit(buffer,screen,0,0,0,0,ANCHO,LARGO);
+    rest(2000);
+    readkey();
+    destroy_bitmap(buffer);
+    return 0;
+}
+END_OF_MAIN();
